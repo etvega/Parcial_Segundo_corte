@@ -10,9 +10,13 @@ from typing import List
 router = APIRouter(tags=["Matrículas"])
 
 
-# ✅ Crear matrícula (201, 400, 404, 409)
 @router.post("/matriculas/", response_model=MatriculaSchema, status_code=status.HTTP_201_CREATED)
 def crear_matricula(estudiante_id: int, curso_id: int, db: Session = Depends(get_db)):
+    """
+    📘 Crea una nueva matrícula para un estudiante en un curso.
+    - **Valida:** existencia de estudiante y curso.
+    - **Evita duplicados (409)** y retorna la matrícula creada.
+    """
     estudiante = db.query(Estudiante).filter(Estudiante.id == estudiante_id).first()
     curso = db.query(Curso).filter(Curso.id == curso_id).first()
 
@@ -35,27 +39,37 @@ def crear_matricula(estudiante_id: int, curso_id: int, db: Session = Depends(get
     return nueva
 
 
-# ✅ Listar matrículas (200)
 @router.get("/matriculas/", response_model=List[MatriculaSchema], status_code=status.HTTP_200_OK)
 def listar_matriculas(incluir_archivadas: bool = False, db: Session = Depends(get_db)):
+    """
+    📗 Lista todas las matrículas registradas.
+    - **Parámetro opcional:** incluir_archivadas (bool).
+    """
     query = db.query(Matricula)
     if not incluir_archivadas:
         query = query.filter(Matricula.archivada == False)
     return query.all()
 
 
-# ✅ Obtener matrícula por ID (200, 404)
 @router.get("/matriculas/{id}", response_model=MatriculaSchema, status_code=status.HTTP_200_OK)
 def obtener_matricula(id: int, db: Session = Depends(get_db)):
+    """
+    📙 Obtiene una matrícula por su ID.
+    - **Error 404:** si no existe.
+    """
     matricula = db.query(Matricula).filter(Matricula.id == id).first()
     if not matricula:
         raise HTTPException(status_code=404, detail="Matrícula no encontrada")
     return matricula
 
 
-# ✅ Desmatricular (archiva la matrícula) (200, 404, 400)
 @router.delete("/matriculas/{id}", status_code=status.HTTP_200_OK)
 def desmatricular(id: int, db: Session = Depends(get_db)):
+    """
+    ❌ Archiva (desmatricula) un registro activo.
+    - **Error 404:** si no existe.
+    - **Error 400:** si ya está archivada.
+    """
     matricula = db.query(Matricula).filter(Matricula.id == id).first()
     if not matricula:
         raise HTTPException(status_code=404, detail="Matrícula no encontrada")
