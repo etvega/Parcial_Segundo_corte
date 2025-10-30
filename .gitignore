@@ -1,0 +1,18 @@
+# Archivos de base de datos
+*.db
+
+# Carpetas de caché
+__pycache__/
+*.pyc
+
+# Entorno virtual
+venv/
+.env
+
+# Configuración de IDE (PyCharm)
+.idea/
+.vscode/
+
+# Archivos temporales del sistema
+.DS_Store
+Thumbs.db
