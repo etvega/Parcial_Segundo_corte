@@ -30,7 +30,7 @@ def crear_curso(curso: CursoCreate, db: Session = Depends(get_db)):
 @router.get("/cursos/", response_model=List[CursoSchema], status_code=status.HTTP_200_OK)
 def listar_cursos(creditos: int | None = None, codigo: str | None = None, db: Session = Depends(get_db)):
     """
-    📗 Lista todos los cursos o filtra por número de créditos o código.
+     Lista todos los cursos o filtra por número de créditos o código.
     - **Parámetros opcionales:** creditos, codigo.
     """
     query = db.query(Curso)
@@ -44,7 +44,7 @@ def listar_cursos(creditos: int | None = None, codigo: str | None = None, db: Se
 @router.get("/cursos/{id}", status_code=status.HTTP_200_OK)
 def obtener_curso_y_estudiantes(id: int, db: Session = Depends(get_db)):
     """
-    📙 Muestra la información de un curso y sus estudiantes activos.
+    Muestra la información de un curso y sus estudiantes activos.
     - **Incluye:** estudiantes con matrícula no archivada.
     - **Error 404:** si el curso no existe.
     """
@@ -62,7 +62,7 @@ def obtener_curso_y_estudiantes(id: int, db: Session = Depends(get_db)):
 @router.put("/cursos/{id}", response_model=CursoSchema, status_code=status.HTTP_200_OK)
 def actualizar_curso(id: int, datos: CursoUpdate, db: Session = Depends(get_db)):
     """
-    ✏️ Actualiza un curso existente.
+    ✏Actualiza un curso existente.
     - **Valida:** que se envíen datos (400) y que exista (404).
     """
     curso = db.query(Curso).filter(Curso.id == id).first()
@@ -84,7 +84,7 @@ def actualizar_curso(id: int, datos: CursoUpdate, db: Session = Depends(get_db))
 @router.delete("/cursos/{id}", status_code=status.HTTP_200_OK)
 def eliminar_curso(id: int, db: Session = Depends(get_db)):
     """
-    ❌ Elimina un curso y archiva las matrículas asociadas.
+     Elimina un curso y archiva las matrículas asociadas.
     - **Error 404:** si el curso no existe.
     """
     curso = db.query(Curso).filter(Curso.id == id).first()
