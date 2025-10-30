@@ -1,4 +1,3 @@
-# operations/estudiantes.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database.connection import get_db
@@ -9,9 +8,14 @@ from typing import List
 
 router = APIRouter(tags=["Estudiantes"])
 
-# ✅ Crear estudiante
+
 @router.post("/estudiantes/", response_model=EstudianteSchema, status_code=status.HTTP_201_CREATED)
 def crear_estudiante(estudiante: EstudianteCreate, db: Session = Depends(get_db)):
+    """
+    📘 Crea un nuevo estudiante en la base de datos.
+    - **Validación:** no permite correos duplicados (409).
+    - **Retorna:** el estudiante creado.
+    """
     existente = db.query(Estudiante).filter(Estudiante.correo == estudiante.correo).first()
     if existente:
         raise HTTPException(status_code=409, detail="El correo ya está registrado")
@@ -23,9 +27,13 @@ def crear_estudiante(estudiante: EstudianteCreate, db: Session = Depends(get_db)
     return nuevo
 
 
-# ✅ Listar estudiantes (con filtro por semestre)
 @router.get("/estudiantes/", response_model=List[EstudianteSchema], status_code=status.HTTP_200_OK)
 def listar_estudiantes(semestre: int | None = None, db: Session = Depends(get_db)):
+    """
+    📗 Lista todos los estudiantes o filtra por semestre.
+    - **Parámetro opcional:** semestre (int).
+    - **Error 404:** si no hay resultados.
+    """
     query = db.query(Estudiante)
     if semestre:
         query = query.filter(Estudiante.semestre == semestre)
@@ -37,9 +45,13 @@ def listar_estudiantes(semestre: int | None = None, db: Session = Depends(get_db
     return estudiantes
 
 
-# ✅ Obtener estudiante con cursos matriculados
 @router.get("/estudiantes/{id}", status_code=status.HTTP_200_OK)
 def obtener_estudiante_con_cursos(id: int, db: Session = Depends(get_db)):
+    """
+    📙 Obtiene la información de un estudiante y sus cursos matriculados.
+    - **Incluye:** cursos activos (no archivados).
+    - **Error 404:** si el estudiante no existe.
+    """
     estudiante = db.query(Estudiante).filter(Estudiante.id == id).first()
     if not estudiante:
         raise HTTPException(status_code=404, detail="Estudiante no encontrado")
@@ -53,9 +65,13 @@ def obtener_estudiante_con_cursos(id: int, db: Session = Depends(get_db)):
     return {"estudiante": estudiante, "cursos": cursos}
 
 
-# ✅ Actualizar estudiante (solo los campos enviados)
 @router.put("/estudiantes/{id}", response_model=EstudianteSchema, status_code=status.HTTP_200_OK)
 def actualizar_estudiante(id: int, datos: EstudianteUpdate, db: Session = Depends(get_db)):
+    """
+    ✏️ Actualiza parcialmente un estudiante.
+    - **Valida:** que el correo no esté usado por otro estudiante.
+    - **Error 404:** si no existe el estudiante.
+    """
     estudiante = db.query(Estudiante).filter(Estudiante.id == id).first()
     if not estudiante:
         raise HTTPException(status_code=404, detail="Estudiante no encontrado")
@@ -76,9 +92,13 @@ def actualizar_estudiante(id: int, datos: EstudianteUpdate, db: Session = Depend
     return estudiante
 
 
-# ✅ Eliminar estudiante (archiva sus matrículas)
 @router.delete("/estudiantes/{id}", status_code=status.HTTP_200_OK)
 def eliminar_estudiante(id: int, db: Session = Depends(get_db)):
+    """
+    ❌ Elimina un estudiante y archiva sus matrículas asociadas.
+    - **Error 404:** si el estudiante no existe.
+    - **Regla:** las matrículas no se borran, se archivan.
+    """
     estudiante = db.query(Estudiante).filter(Estudiante.id == id).first()
     if not estudiante:
         raise HTTPException(status_code=404, detail="Estudiante no encontrado")
