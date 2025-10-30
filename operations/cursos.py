@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from typing import List
 from database.connection import get_db
@@ -8,12 +8,13 @@ from schemas.curso_schema import CursoSchema, CursoCreate, CursoUpdate
 
 router = APIRouter(tags=["Cursos"])
 
-# ✅ Crear curso
-@router.post("/cursos/", response_model=CursoSchema)
+# ✅ Crear curso (201, 409)
+@router.post("/cursos/", response_model=CursoSchema, status_code=status.HTTP_201_CREATED)
 def crear_curso(curso: CursoCreate, db: Session = Depends(get_db)):
     existe = db.query(Curso).filter(Curso.codigo == curso.codigo).first()
     if existe:
         raise HTTPException(status_code=409, detail="El código ya está registrado")
+
     nuevo = Curso(**curso.model_dump())
     db.add(nuevo)
     db.commit()
@@ -21,9 +22,13 @@ def crear_curso(curso: CursoCreate, db: Session = Depends(get_db)):
     return nuevo
 
 
-# ✅ Listar cursos (filtro: crédito o código)
-@router.get("/cursos/", response_model=List[CursoSchema])
-def listar_cursos(creditos: int | None = None, codigo: str | None = None, db: Session = Depends(get_db)):
+# ✅ Listar cursos (200)
+@router.get("/cursos/", response_model=List[CursoSchema], status_code=status.HTTP_200_OK)
+def listar_cursos(
+    creditos: int | None = None,
+    codigo: str | None = None,
+    db: Session = Depends(get_db)
+):
     query = db.query(Curso)
     if creditos:
         query = query.filter(Curso.creditos == creditos)
@@ -32,8 +37,8 @@ def listar_cursos(creditos: int | None = None, codigo: str | None = None, db: Se
     return query.all()
 
 
-# ✅ Obtener curso y estudiantes activos
-@router.get("/cursos/{id}")
+# ✅ Obtener curso y estudiantes (200, 404)
+@router.get("/cursos/{id}", status_code=status.HTTP_200_OK)
 def obtener_curso_y_estudiantes(id: int, db: Session = Depends(get_db)):
     curso = db.query(Curso).filter(Curso.id == id).first()
     if not curso:
@@ -46,14 +51,18 @@ def obtener_curso_y_estudiantes(id: int, db: Session = Depends(get_db)):
     return {"curso": curso, "estudiantes": estudiantes}
 
 
-# ✅ Actualizar curso (solo campos enviados)
-@router.put("/cursos/{id}", response_model=CursoSchema)
+# ✅ Actualizar curso (200, 400, 404)
+@router.put("/cursos/{id}", response_model=CursoSchema, status_code=status.HTTP_200_OK)
 def actualizar_curso(id: int, datos: CursoUpdate, db: Session = Depends(get_db)):
     curso = db.query(Curso).filter(Curso.id == id).first()
     if not curso:
         raise HTTPException(status_code=404, detail="Curso no encontrado")
 
-    for key, value in datos.model_dump(exclude_unset=True).items():
+    cambios = datos.model_dump(exclude_unset=True)
+    if not cambios:
+        raise HTTPException(status_code=400, detail="No se enviaron datos para actualizar")
+
+    for key, value in cambios.items():
         setattr(curso, key, value)
 
     db.commit()
@@ -61,8 +70,8 @@ def actualizar_curso(id: int, datos: CursoUpdate, db: Session = Depends(get_db))
     return curso
 
 
-# ✅ Eliminar curso y archivar matrículas
-@router.delete("/cursos/{id}")
+# ✅ Eliminar curso (200, 404)
+@router.delete("/cursos/{id}", status_code=status.HTTP_200_OK)
 def eliminar_curso(id: int, db: Session = Depends(get_db)):
     curso = db.query(Curso).filter(Curso.id == id).first()
     if not curso:
