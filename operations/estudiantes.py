@@ -12,7 +12,7 @@ router = APIRouter(tags=["Estudiantes"])
 @router.post("/estudiantes/", response_model=EstudianteSchema, status_code=status.HTTP_201_CREATED)
 def crear_estudiante(estudiante: EstudianteCreate, db: Session = Depends(get_db)):
     """
-    📘 Crea un nuevo estudiante en la base de datos.
+    Crea un nuevo estudiante en la base de datos.
     - **Validación:** no permite correos duplicados (409).
     - **Retorna:** el estudiante creado.
     """
@@ -30,7 +30,7 @@ def crear_estudiante(estudiante: EstudianteCreate, db: Session = Depends(get_db)
 @router.get("/estudiantes/", response_model=List[EstudianteSchema], status_code=status.HTTP_200_OK)
 def listar_estudiantes(semestre: int | None = None, db: Session = Depends(get_db)):
     """
-    📗 Lista todos los estudiantes o filtra por semestre.
+     Lista todos los estudiantes o filtra por semestre.
     - **Parámetro opcional:** semestre (int).
     - **Error 404:** si no hay resultados.
     """
@@ -48,7 +48,7 @@ def listar_estudiantes(semestre: int | None = None, db: Session = Depends(get_db
 @router.get("/estudiantes/{id}", status_code=status.HTTP_200_OK)
 def obtener_estudiante_con_cursos(id: int, db: Session = Depends(get_db)):
     """
-    📙 Obtiene la información de un estudiante y sus cursos matriculados.
+     Obtiene la información de un estudiante y sus cursos matriculados.
     - **Incluye:** cursos activos (no archivados).
     - **Error 404:** si el estudiante no existe.
     """
@@ -68,7 +68,7 @@ def obtener_estudiante_con_cursos(id: int, db: Session = Depends(get_db)):
 @router.put("/estudiantes/{id}", response_model=EstudianteSchema, status_code=status.HTTP_200_OK)
 def actualizar_estudiante(id: int, datos: EstudianteUpdate, db: Session = Depends(get_db)):
     """
-    ✏️ Actualiza parcialmente un estudiante.
+     Actualiza parcialmente un estudiante.
     - **Valida:** que el correo no esté usado por otro estudiante.
     - **Error 404:** si no existe el estudiante.
     """
@@ -95,7 +95,7 @@ def actualizar_estudiante(id: int, datos: EstudianteUpdate, db: Session = Depend
 @router.delete("/estudiantes/{id}", status_code=status.HTTP_200_OK)
 def eliminar_estudiante(id: int, db: Session = Depends(get_db)):
     """
-    ❌ Elimina un estudiante y archiva sus matrículas asociadas.
+    Elimina un estudiante y archiva sus matrículas asociadas.
     - **Error 404:** si el estudiante no existe.
     - **Regla:** las matrículas no se borran, se archivan.
     """
