@@ -13,7 +13,7 @@ router = APIRouter(tags=["Matrículas"])
 @router.post("/matriculas/", response_model=MatriculaSchema, status_code=status.HTTP_201_CREATED)
 def crear_matricula(estudiante_id: int, curso_id: int, db: Session = Depends(get_db)):
     """
-    📘 Crea una nueva matrícula para un estudiante en un curso.
+     Crea una nueva matrícula para un estudiante en un curso.
     - **Valida:** existencia de estudiante y curso.
     - **Evita duplicados (409)** y retorna la matrícula creada.
     """
@@ -42,7 +42,7 @@ def crear_matricula(estudiante_id: int, curso_id: int, db: Session = Depends(get
 @router.get("/matriculas/", response_model=List[MatriculaSchema], status_code=status.HTTP_200_OK)
 def listar_matriculas(incluir_archivadas: bool = False, db: Session = Depends(get_db)):
     """
-    📗 Lista todas las matrículas registradas.
+    Lista todas las matrículas registradas.
     - **Parámetro opcional:** incluir_archivadas (bool).
     """
     query = db.query(Matricula)
@@ -54,7 +54,7 @@ def listar_matriculas(incluir_archivadas: bool = False, db: Session = Depends(ge
 @router.get("/matriculas/{id}", response_model=MatriculaSchema, status_code=status.HTTP_200_OK)
 def obtener_matricula(id: int, db: Session = Depends(get_db)):
     """
-    📙 Obtiene una matrícula por su ID.
+     Obtiene una matrícula por su ID.
     - **Error 404:** si no existe.
     """
     matricula = db.query(Matricula).filter(Matricula.id == id).first()
@@ -66,7 +66,7 @@ def obtener_matricula(id: int, db: Session = Depends(get_db)):
 @router.delete("/matriculas/{id}", status_code=status.HTTP_200_OK)
 def desmatricular(id: int, db: Session = Depends(get_db)):
     """
-    ❌ Archiva (desmatricula) un registro activo.
+     Archiva (desmatricula) un registro activo.
     - **Error 404:** si no existe.
     - **Error 400:** si ya está archivada.
     """
