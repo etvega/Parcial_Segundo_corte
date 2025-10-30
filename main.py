@@ -11,7 +11,7 @@ Base.metadata.create_all(bind=engine)
 
 # 🔹 Inicializar la aplicación FastAPI
 app = FastAPI(
-    title="Sistema Universidad 🏫",
+    title="Sistema Universidad ",
     description="API para gestionar cursos, estudiantes y matrículas",
     version="1.0.0",
     contact={
@@ -37,7 +37,7 @@ app.include_router(matriculas_router)
 # 🔹 Ruta raíz para probar la API
 @app.get("/")
 def home():
-    return {"mensaje": "Bienvenido al Sistema de Universidad 🏫"}
+    return {"mensaje": "Bienvenido al Sistema de Universidad "}
 
 # 🔹 Ruta para evitar el error 404 del favicon
 @app.get("/favicon.ico")
@@ -48,4 +48,4 @@ def favicon():
 # 🔹 Evento opcional de inicio (solo informativo)
 @app.on_event("startup")
 def startup_event():
-    print("🚀 Servidor iniciado correctamente y base de datos conectada.")
+    print("El Servidor a iniciado correctamente y base de datos conectada.")
